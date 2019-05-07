@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Superposition of waves</title>
+</head>
+
+<link rel="stylesheet" href="./libraries/bootstrap.min.css">
+<link rel="stylesheet" href="./style.css">
+
+<body>
+
+  <div style="position: relative;">
+    <svg id='canvas' width='1366px' height='768px'>
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="2" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,4 L6,2 z" fill="#000" />
+        </marker>
+        <marker id="arrow_1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+        </marker>
+      </defs>
+    </svg>>
+  </div>
+
+  <div id='wave1_controls_div' style="position: absolute;">
+    <div class="pb-2"> <input type="range" class="slider" id="wave1_amp"/> <span class="text_align range-slider__value" id="wave1_amp_text"></span> </div>
+    <div class="pb-2"> <input type="range" class="slider" id="wave1_freq"/> <span class="text_align range-slider__value" id="wave1_freq_text"></span> </div>
+    <div class="pb-2"> <input type="range" class="slider" id="wave1_phase"/> <span class="text_align range-slider__value" id="wave1_phase_text"></span> </div>
+  </div>
+
+  <div id='wave2_controls_div' style="position: absolute;">
+    <div class="pb-2"> <input type="range" class="slider" id="wave2_amp"/> <span class="text_align range-slider__value" id="wave2_amp_text"></span> </div>
+    <div class="pb-2"> <input type="range" class="slider" id="wave2_freq"/> <span class="text_align range-slider__value" id="wave2_freq_text"></span> </div>
+    <div class="pb-2"> <input type="range" class="slider" id="wave2_phase"/> <span class="text_align range-slider__value" id="wave2_phase_text"></span> </div>
+  </div>
+
+  <div id='play-pause' style="position: absolute;"> <button class="btn btn-primary">Play</button> </div>
+
+</body>
+
+<script src="./libraries/d3.v4.min.js"></script>
+<script src="./libraries/d3-selection-multi.v1.min.js"></script>
+<script src="./libraries/jquery-3.4.0.min.js"></script>
+
+<script src="./libraries/math.min.js"></script>
+<script src="./libraries/numeric.min.js"></script>
+
+<script src="./libraries/plotly-latest.min.js"></script>
+
+<script src="./libraries/popper.min.js"></script>
+<script src="./libraries/bootstrap.min.js"></script>
+
+<script src="./index.js"></script>
+<script src="./wave.js"></script>
+<script src="./superposedWave.js"></script>
+
+</html>
