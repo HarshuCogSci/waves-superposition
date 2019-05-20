@@ -46,13 +46,12 @@ Wave.prototype.createPhasor = function(){
   this.phaser.g.append('line').attrs({ y1: -0.5*this.phaser.length, x1: 0, y2: 0.5*this.phaser.length, x2: 0 }).styles({ 'stroke-width': 1, 'stroke': 'gray' });
 
   this.phaser.vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.stroke });
-  this.rotatePhasor();
 }
 
 // ************************************************************************************************** //
 // Rotate Phasor
 
-Wave.prototype.rotatePhasor = function(){
+Wave.prototype.rotatePhasor = function(time_index){
   var x = this.phaser.scale(this.x[time_index]);
   var y = this.phaser.scale(this.y[time_index]);
 
@@ -101,7 +100,7 @@ Wave.prototype.createConnector = function(){
 // ************************************************************************************************** //
 // Update Connector
 
-Wave.prototype.updateConnector = function(){
+Wave.prototype.updateConnector = function(time_index){
   var x1 = this.phaser.cx + this.phaser.scale(this.x[time_index]);
   var y1 = this.phaser.cy - this.phaser.scale(this.y[time_index]);
   var x2 = this.graph.cx + this.graph.xScale(this.t[time_index]);

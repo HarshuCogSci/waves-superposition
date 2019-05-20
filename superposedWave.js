@@ -43,14 +43,12 @@ SuperposedWave.prototype.createPhasor = function(){
   this.phaser.vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.stroke });
   this.phaser.wave1_vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.wave_1.stroke });
   this.phaser.wave2_vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.wave_2.stroke });
-
-  this.rotatePhasor();
 }
 
 // ************************************************************************************************** //
 // Rotate Phasor
 
-SuperposedWave.prototype.rotatePhasor = function(){
+SuperposedWave.prototype.rotatePhasor = function(time_index){
   var x2 = this.phaser.scale(this.x[time_index]);
   var y2 = this.phaser.scale(this.y[time_index]);
   this.phaser.vector.attrs({ x2: x2, y2: -y2 });
@@ -124,7 +122,7 @@ SuperposedWave.prototype.createConnector = function(){
 // ************************************************************************************************** //
 // Update Connector
 
-SuperposedWave.prototype.updateConnector = function(){
+SuperposedWave.prototype.updateConnector = function(time_index){
   var x1 = this.phaser.cx + this.phaser.scale(this.x[time_index]);
   var y1 = this.phaser.cy - this.phaser.scale(this.y[time_index]);
   var x2 = this.graph.cx + this.graph.xScale(this.t[time_index]);
