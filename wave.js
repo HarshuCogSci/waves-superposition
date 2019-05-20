@@ -63,9 +63,6 @@ Wave.prototype.rotatePhasor = function(){
 // Create Graph
 
 Wave.prototype.createGraph = function(){
-  // this.graph.xScale = d3.scaleLinear().domain([0,5]).range([0, this.graph.width-10]);
-  // this.graph.yScale = d3.scaleLinear().domain([-6, 6]).range([0.5*this.graph.height, -0.5*this.graph.height]);
-
   this.graph.cx = this.graph.x+5;
   this.graph.cy = this.graph.y+0.5*this.graph.height;
 
@@ -88,8 +85,6 @@ Wave.prototype.updateGraph = function(start_index, end_index, start_time){
 
   var t_array = this.t.slice(start_index, end_index);
   var y_array = this.y.slice(start_index, end_index);
-  // var t0 = t_array[0];
-  // t_array = t_array.map(d => { return d-t0 })
 
   var data = d3.range(t_array.length).map((d,i) => { return { x: this.graph.xScale(t_array[i]), y: this.graph.yScale(y_array[i]) } });
   this.graph.area.attrs({ d: area_gen(data) });
@@ -111,10 +106,6 @@ Wave.prototype.updateConnector = function(){
   var y1 = this.phaser.cy - this.phaser.scale(this.y[time_index]);
   var x2 = this.graph.cx + this.graph.xScale(this.t[time_index]);
   var y2 = this.graph.cy + this.graph.yScale(this.y[time_index]);
-
-  // if(time_index > Math.floor(displaySpan/dt)){
-  //   x2 = this.graph.cx + this.graph.xScale(displaySpan);
-  // }
 
   this.connector.line.attrs({ x1: x1, y1: y1, x2: x2, y2:y2 });
 }

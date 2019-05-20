@@ -3,7 +3,7 @@
 
 $('document').ready(() => {
   $('[data-toggle="popover"]').popover();
-  setup();
+  setup(); update(); simulate();
 })
 
 // ************************************************************************************************** //
@@ -90,8 +90,6 @@ function setup(){
 
   createControls();
   createEventListeners();
-
-  update();
 }
 
 // ************************************************************************************************** //
@@ -111,11 +109,6 @@ function update(){
   wave_1.updateGraph(start_index, end_index, start_time);
   wave_2.updateGraph(start_index, end_index, start_time);
   wave_3.updateGraph(start_index, end_index, start_time);
-  // wave_1.updateGraph(start_time, end_time);
-  // wave_2.updateGraph(start_time, end_time);
-
-  // time_index = Math.floor(displaySpan/dt) - 1; // Remove this once you update superposedWave ka updateGraph
-  // wave_3.updateGraph();
 
   time_index = 0;
   wave_1.rotatePhasor();
@@ -126,7 +119,6 @@ function update(){
   wave_3.updateConnector();
 
   updateDials();
-  simulate();
 }
 
 // ************************************************************************************************** //
@@ -146,21 +138,18 @@ function simulate(){
 
     wave_1.rotatePhasor();
     wave_1.updateGraph(start_index, end_index, start_time);
-    // wave_1.updateGraph(start_time, end_time);
     wave_1.updateConnector();
 
     wave_2.rotatePhasor();
     wave_2.updateGraph(start_index, end_index, start_time);
-    // wave_2.updateGraph(start_time, end_time);
     wave_2.updateConnector();
 
     wave_3.rotatePhasor();
-    // wave_3.updateGraph();
     wave_3.updateGraph(start_index, end_index, start_time);
     wave_3.updateConnector();
   }
 
-  if(time_index >= time_array.length){ stop(); return }
+  if(time_index >= time_array.length){ stop(); update(); return }
   if(simulationRunning){ window.requestAnimationFrame(simulate); }
 }
 
@@ -177,7 +166,6 @@ function play(){
 function stop(){
   d3.select('#play-pause').html('Play');
   simulationRunning = false;
-  // update();
 }
 
 // ************************************************************************************************** //

@@ -66,9 +66,6 @@ SuperposedWave.prototype.rotatePhasor = function(){
 // Create Graph
 
 SuperposedWave.prototype.createGraph = function(){
-  // this.graph.xScale = d3.scaleLinear().domain([0,5]).range([0, this.graph.width-10]);
-  // this.graph.yScale = d3.scaleLinear().domain([-6, 6]).range([0.5*this.graph.height, -0.5*this.graph.height]);
-
   this.graph.cx = this.graph.x+5;
   this.graph.cy = this.graph.y+0.5*this.graph.height;
 
@@ -84,8 +81,6 @@ SuperposedWave.prototype.createGraph = function(){
   this.graph.area = this.graph.g.append('path').styles({ 'stroke': this.stroke, 'stroke-width': 2, 'fill': this.stroke, 'fill-opacity': 0.5 });
   this.graph.wave1_area = this.graph.g.append('path').styles({ 'stroke': 'none', 'fill': this.wave_1.stroke, 'opacity': 0.5 });
   this.graph.wave2_area = this.graph.g.append('path').styles({ 'stroke': 'none', 'fill': this.wave_2.stroke, 'opacity': 0.4 });
-
-  // this.updateGraph();
 }
 
 // ************************************************************************************************** //
@@ -95,20 +90,6 @@ SuperposedWave.prototype.updateGraph = function(start_index, end_index, start_ti
   this.graph.xScale = d3.scaleLinear().domain([start_time,start_time+displaySpan]).range([0, this.graph.width-10]);
   this.graph.xAxis.call( d3.axisBottom(this.graph.xScale).ticks(2) );
   this.graph.yAxis.call( d3.axisLeft(this.graph.yScale).ticks(2) );
-
-  // if( time_index < Math.floor(displaySpan/dt) ){
-  //   var t_array = this.t.slice(0, time_index+1);
-  //   var y_array = this.wave_1.y.slice(0, time_index+1);
-  //   var data = d3.range(t_array.length).map((d,i) => { return { x: this.graph.xScale(t_array[i]), y: this.graph.yScale(y_array[i]) } });
-  //   this.graph.wave1_area.attrs({ d: area_gen(data) });
-
-  //   var y_array = this.y.slice(0, time_index+1);
-  //   var baseline_array = this.wave_1.y.slice(0, time_index+1);
-  //   var data = d3.range(t_array.length).map((d,i) => { return { x: this.graph.xScale(t_array[i]), y: this.graph.yScale(y_array[i]), baseline: this.graph.yScale(baseline_array[i]) } });
-  //   this.graph.wave2_area.attrs({ d: this.area_gen(data) });
-
-  //   this.graph.path.attrs({ d: line_gen(data) });
-  // }
 
   var t_array = this.t.slice(start_index, end_index);
 
@@ -130,10 +111,6 @@ SuperposedWave.prototype.updateGraph = function(start_index, end_index, start_ti
     this.graph.area.attrs({ d: area_gen(data) });
   }
 
-
-
-  // this.graph.path.attrs({ d: line_gen(data) }).styles({ 'stroke': this.stroke, 'fill': 'none' });
-  // this.graph.path.attrs({ d: area_gen(data) }).styles({ 'stroke': this.stroke, 'fill': this.stroke });
 }
 
 // ************************************************************************************************** //
