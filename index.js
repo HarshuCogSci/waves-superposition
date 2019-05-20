@@ -7,12 +7,14 @@ $('document').ready(() => {
 })
 
 // ************************************************************************************************** //
-// Setup
+// Parameters
 
 var width = 1366, height = 768;
 
-var timeSpan = 5, displaySpan = 5, dt = 0.01;
-var time_array = d3.range(0,timeSpan,dt), time = 0, time_index = 0;
+var timeSpan = 20, displaySpan = 5, dt = 0.01;
+var display_index = Math.floor(displaySpan/dt), start_index = 0, end_index = 0;
+var start_time = 0, end_time = 0;
+var time_array = d3.range(0,timeSpan+0.5*dt,dt), time = 0, time_index = 0;
 var amp_min = 1, amp_delta = 4, amp_max = amp_min+amp_delta;
 var freq_min = 1, freq_delta = 9, freq_max = freq_min+freq_delta;
 
@@ -20,6 +22,12 @@ var line_gen = d3.line().x((d) => { return d.x }).y((d) => { return d.y });
 var area_gen = d3.area().x((d) => { return d.x }).y0(0).y1((d) => { return d.y });
 
 var startTime = 0, simulationRunning = false;
+var timeDial;
+
+var toggleSuperposedView = true;
+
+// ************************************************************************************************** //
+// Setup
 
 function setup(){
   wave_1 = new Wave();
@@ -81,9 +89,9 @@ function setup(){
   /**************************************/
 
   createControls();
+  createEventListeners();
 
-  startTime = Date.now();
-  simulate();
+  update();
 }
 
 // ************************************************************************************************** //
@@ -93,7 +101,31 @@ function update(){
   wave_1.setup();
   wave_2.setup();
   wave_3.setup();
-  startTime = Date.now();
+
+  start_index = 0;
+  end_index = display_index;
+
+  start_time = 0;
+  end_time = displaySpan;
+
+  wave_1.updateGraph(start_index, end_index, start_time);
+  wave_2.updateGraph(start_index, end_index, start_time);
+  wave_3.updateGraph(start_index, end_index, start_time);
+  // wave_1.updateGraph(start_time, end_time);
+  // wave_2.updateGraph(start_time, end_time);
+
+  // time_index = Math.floor(displaySpan/dt) - 1; // Remove this once you update superposedWave ka updateGraph
+  // wave_3.updateGraph();
+
+  time_index = 0;
+  wave_1.rotatePhasor();
+  wave_1.updateConnector();
+  wave_2.rotatePhasor();
+  wave_2.updateConnector();
+  wave_3.rotatePhasor();
+  wave_3.updateConnector();
+
+  updateDials();
   simulate();
 }
 
@@ -105,84 +137,227 @@ function simulate(){
   time_index = parseInt(time/dt);
 
   if(time_index < time_array.length){
+
+    if(time_index > display_index){ end_index = time_index; start_index = time_index - display_index; }
+    else { start_index = 0; end_index = time_index; }
+
+    if(time > displaySpan){ end_time = time; start_time = time - displaySpan;}
+    else { start_time = 0; end_time = time; }
+
     wave_1.rotatePhasor();
-    wave_1.updateGraph();
+    wave_1.updateGraph(start_index, end_index, start_time);
+    // wave_1.updateGraph(start_time, end_time);
     wave_1.updateConnector();
 
     wave_2.rotatePhasor();
-    wave_2.updateGraph();
+    wave_2.updateGraph(start_index, end_index, start_time);
+    // wave_2.updateGraph(start_time, end_time);
     wave_2.updateConnector();
 
     wave_3.rotatePhasor();
-    wave_3.updateGraph();
+    // wave_3.updateGraph();
+    wave_3.updateGraph(start_index, end_index, start_time);
     wave_3.updateConnector();
   }
 
-  if(time_index < time_array.length){ window.requestAnimationFrame(simulate); }
+  if(time_index >= time_array.length){ stop(); return }
+  if(simulationRunning){ window.requestAnimationFrame(simulate); }
+}
+
+// ************************************************************************************************** //
+// Timer functions
+
+function play(){
+  d3.select('#play-pause').html('Stop');
+  startTime = Date.now();
+  simulationRunning = true;
+  simulate();
+}
+
+function stop(){
+  d3.select('#play-pause').html('Play');
+  simulationRunning = false;
+  // update();
 }
 
 // ************************************************************************************************** //
 // Create Controls
 
 function createControls(){
+  createDials();
+  d3.select('#play-pause-div').styles({ top: (1*height+20)+'px', left: (0*width+650)+'px' });
+}
 
-  // Wave 1
-  d3.select('#wave1_controls_div').styles({ top: (1*height+20)+'px', left: (0*width+50)+'px' });
+// ************************************************************************************************** //
+// Create Dials
 
-  d3.select('#wave1_amp').attrs({ min: amp_min, max: amp_max, step: 0.1, value: wave_1.amp })
-    .on('change', function(){
-      wave_1.amp = parseFloat(d3.select(this).property('value'));
-      update();
-      d3.select('#wave1_amp_text').html('X = '+wave_1.amp.toFixed(1));
-    });
-  d3.select('#wave1_amp_text').html('X = '+wave_1.amp.toFixed(1));
+function createDials(){
 
-  d3.select('#wave1_freq').attrs({ min: freq_min, max: freq_max, step: 0.1, value: wave_1.freq })
-    .on('change', function(){
-      wave_1.freq = parseFloat(d3.select(this).property('value'));
-      update();
-      d3.select('#wave1_freq_text').html('X = '+wave_1.freq.toFixed(1));
-    });
-  d3.select('#wave1_freq_text').html('ω = '+wave_1.freq.toFixed(1) + ' Hz');
+  //*********** Wave 1 - Amplitude Dial ********************//
+  var params = {
+    min: amp_min, max: amp_max, step: 0.1,
+    svg: 'canvas',
+    symbol: 'X', color: 'steelblue', unit: 'rad',
+    cx: 0.85*width, cy: 0.2*height, size: 0.08*height,
+    active: true,
+  };
 
-  d3.select('#wave1_phase').attrs({ min: 0, max: 360, step: 1, value: wave_1.phase_degrees })
-    .on('change', function(){
-      wave_1.phase_degrees = parseFloat(d3.select(this).property('value'));
-      wave_1.phase = wave_1.phase_degrees*Math.PI/180;
-      update();
-      d3.select('#wave1_phase_text').html('X = '+wave_1.phase_degrees.toFixed(1));
-    });
-  d3.select('#wave1_phase_text').html('θ = '+wave_1.phase_degrees.toFixed(0) + '°');
+  wave_1.dial_amp = new Dial();
+  wave_1.dial_amp.setup(params);
+  wave_1.dial_amp.create();
+  //*********** Wave 1 - Amplitude Dial ********************//
 
-  // Wave 2
-  d3.select('#wave2_controls_div').styles({ top: (1*height+20)+'px', left: (0*width+350)+'px' });
+  //*********** Wave 1 - Frequency Dial ********************//
+  var params = {
+    min: freq_min, max: freq_max, step: 0.1,
+    svg: 'canvas',
+    symbol: 'ω', color: 'orange', unit: 'Hz',
+    cx: 0.91*width, cy: 0.2*height, size: 0.08*height,
+    active: true,
+  };
 
-  d3.select('#wave2_amp').attrs({ min: amp_min, max: amp_max, step: 0.1, value: wave_1.amp })
-    .on('change', function(){
-      wave_2.amp = parseFloat(d3.select(this).property('value'));
-      update();
-      d3.select('#wave2_amp_text').html('X = '+wave_2.amp.toFixed(1));
-    });
-  d3.select('#wave2_amp_text').html('X = '+wave_2.amp.toFixed(1));
+  wave_1.dial_freq = new Dial();
+  wave_1.dial_freq.setup(params);
+  wave_1.dial_freq.create();
+  //*********** Wave 1 - Frequency Dial ********************//
 
-  d3.select('#wave2_freq').attrs({ min: freq_min, max: freq_max, step: 0.1, value: wave_2.freq })
-    .on('change', function(){
-      wave_2.freq = parseFloat(d3.select(this).property('value'));
-      update();
-      d3.select('#wave2_freq_text').html('X = '+wave_2.freq.toFixed(1));
-    });
-  d3.select('#wave2_freq_text').html('ω = '+wave_2.freq.toFixed(1) + ' Hz');
+  //*********** Wave 1 - Phase Dial ********************//
+  var params = {
+    min: 0, max: 360, step: 1,
+    svg: 'canvas',
+    symbol: 'Ф', color: 'green', unit: 'degree',
+    cx: 0.97*width, cy: 0.2*height, size: 0.08*height,
+    active: true,
+  };
 
-  d3.select('#wave2_phase').attrs({ min: 0, max: 360, step: 1, value: wave_2.phase_degrees })
-    .on('change', function(){
-      wave_2.phase_degrees = parseFloat(d3.select(this).property('value'));
-      wave_2.phase = wave_2.phase_degrees*Math.PI/180;
-      update();
-      d3.select('#wave2_phase_text').html('X = '+wave_2.phase_degrees.toFixed(1));
-    });
-  d3.select('#wave2_phase_text').html('θ = '+wave_2.phase_degrees.toFixed(0) + '°');
+  wave_1.dial_phase = new Dial();
+  wave_1.dial_phase.setup(params);
+  wave_1.dial_phase.create();
+  //*********** Wave 1 - Phase Dial ********************//
 
-  // Play/pause
-  d3.select('#play-pause').styles({ top: (1*height+20)+'px', left: (0*width+650)+'px' });
+  //*********** Wave 2 - Amplitude Dial ********************//
+  var params = {
+    min: amp_min, max: amp_max, step: 0.1,
+    svg: 'canvas',
+    symbol: 'X', color: 'steelblue', unit: 'rad',
+    cx: 0.85*width, cy: 0.4*height, size: 0.08*height,
+    active: true,
+  };
 
+  wave_2.dial_amp = new Dial();
+  wave_2.dial_amp.setup(params);
+  wave_2.dial_amp.create();
+  //*********** Wave 2 - Amplitude Dial ********************//
+
+  //*********** Wave 2 - Frequency Dial ********************//
+  var params = {
+    min: freq_min, max: freq_max, step: 0.1,
+    svg: 'canvas',
+    symbol: 'ω', color: 'orange', unit: 'Hz',
+    cx: 0.91*width, cy: 0.4*height, size: 0.08*height,
+    active: true,
+  };
+
+  wave_2.dial_freq = new Dial();
+  wave_2.dial_freq.setup(params);
+  wave_2.dial_freq.create();
+  //*********** Wave 2 - Frequency Dial ********************//
+
+  //*********** Wave 2 - Phase Dial ********************//
+  var params = {
+    min: 0, max: 360, step: 1,
+    svg: 'canvas',
+    symbol: 'Ф', color: 'green', unit: 'degree',
+    cx: 0.97*width, cy: 0.4*height, size: 0.08*height,
+    active: true,
+  };
+
+  wave_2.dial_phase = new Dial();
+  wave_2.dial_phase.setup(params);
+  wave_2.dial_phase.create();
+  //*********** Wave 2 - Phase Dial ********************//
+
+  //*********** TimeSpan Dial ********************//
+  var params = {
+    min: 1, max: 20, step: 1,
+    svg: 'canvas',
+    symbol: 't', color: 'gray', unit: 's',
+    cx: 0.85*width, cy: 0.6*height, size: 0.08*height,
+    active: true,
+  };
+
+  timeDial = new Dial();
+  timeDial.setup(params);
+  timeDial.create();
+  //*********** TimeSpan Dial ********************//
+}
+
+// ************************************************************************************************** //
+// Update Dials
+
+function updateDials(){
+  wave_1.dial_amp.update(wave_1.amp);
+  wave_1.dial_freq.update(wave_1.freq);
+  wave_1.dial_phase.update(wave_1.phase_degrees);
+
+  wave_2.dial_amp.update(wave_2.amp);
+  wave_2.dial_freq.update(wave_2.freq);
+  wave_2.dial_phase.update(wave_2.phase_degrees);
+
+  timeDial.update(displaySpan);
+}
+
+// ************************************************************************************************** //
+// Create Event Listeners
+
+function createEventListeners(){
+  wave_1.dial_amp.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_1.amp = temp;
+    stop(); update();
+  })
+
+  wave_1.dial_freq.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_1.freq = temp;
+    stop(); update();
+  })
+
+  wave_1.dial_phase.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_1.phase_degrees = temp;
+    wave_1.phase = wave_1.phase_degrees*Math.PI/180;
+    stop(); update();
+  })
+
+  wave_2.dial_amp.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_2.amp = temp;
+    stop(); update();
+  })
+
+  wave_2.dial_freq.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_2.freq = temp;
+    stop(); update();
+  })
+
+  wave_2.dial_phase.dispatch.on("drag", function(data){
+    var temp = data.value;
+    wave_2.phase_degrees = temp;
+    wave_2.phase = wave_2.phase_degrees*Math.PI/180;
+    stop(); update();
+  })
+
+  timeDial.dispatch.on("drag", function(data){
+    var temp = data.value;
+    displaySpan = temp;
+    display_index = Math.floor(displaySpan/dt);
+    stop(); update();
+  })
+
+  d3.select('#play-pause').on('click', function(){
+    if(simulationRunning == true){ stop(); }
+    else{ play(); }
+  })
 }
