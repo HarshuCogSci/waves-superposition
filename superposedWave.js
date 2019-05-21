@@ -43,6 +43,10 @@ SuperposedWave.prototype.createPhasor = function(){
   this.phaser.vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.stroke });
   this.phaser.wave1_vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.wave_1.stroke });
   this.phaser.wave2_vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.wave_2.stroke });
+
+  this.phaser.circle = this.phaser.g.append('circle').attrs({ cx: 0, cy: 0 }).styles({ 'stroke': this.stroke, 'fill': 'none' });
+  this.phaser.circle_1 = this.phaser.g.append('circle').attrs({ cx: 0, cy: 0 }).styles({ 'stroke': this.wave_1.stroke, 'fill': 'none' });
+  this.phaser.circle_2 = this.phaser.g.append('circle').attrs({ cx: 0, cy: 0 }).styles({ 'stroke': this.wave_2.stroke, 'fill': 'none' });
 }
 
 // ************************************************************************************************** //
@@ -58,6 +62,21 @@ SuperposedWave.prototype.rotatePhasor = function(time_index){
   this.phaser.wave1_vector.attrs({ x2: x1, y2: -y1 });
 
   this.phaser.wave2_vector.attrs({ x1: x1, y1: -y1, x2: x2, y2: -y2 });
+
+  var r = Math.sqrt(x2*x2 + y2*y2);
+  this.phaser.circle.attrs({ r: r });
+  this.phaser.circle_1.attrs({ r: this.phaser.scale(this.wave_1.amp) })
+  this.phaser.circle_2.attrs({ cx: x1, cy: -y1, r: this.phaser.scale(this.wave_2.amp) })
+
+  if(toggleSuperposedView == false){
+    this.phaser.circle.styles({ 'display': 'none' });
+    this.phaser.circle_1.styles({ 'display': null });
+    this.phaser.circle_2.styles({ 'display': null });
+  } else {
+    this.phaser.circle.styles({ 'display': null });
+    this.phaser.circle_1.styles({ 'display': 'none' });
+    this.phaser.circle_2.styles({ 'display': 'none' });
+  }
 }
 
 // ************************************************************************************************** //
@@ -89,9 +108,18 @@ SuperposedWave.prototype.updateGraph = function(start_index, end_index, start_ti
   this.graph.xAxis.call( d3.axisBottom(this.graph.xScale).ticks(2) );
   this.graph.yAxis.call( d3.axisLeft(this.graph.yScale).ticks(2) );
 
+  // this.graph.wave1_area.attrs({ d: null });
+  // this.graph.wave2_area.attrs({ d: null });
+  // this.graph.area.attrs({ d: null });
+  // this.graph.path.attrs({ d: null });
+
   var t_array = this.t.slice(start_index, end_index);
 
   if(toggleSuperposedView == false){
+    this.graph.wave1_area.styles({ display: null });
+    this.graph.wave2_area.styles({ display: null });
+    this.graph.area.styles({ display: 'none' });
+
     var y_array = this.wave_1.y.slice(start_index, end_index);
     var data = d3.range(t_array.length).map((d,i) => { return { x: this.graph.xScale(t_array[i]), y: this.graph.yScale(y_array[i]) } });
     this.graph.wave1_area.attrs({ d: area_gen(data) });
@@ -103,6 +131,10 @@ SuperposedWave.prototype.updateGraph = function(start_index, end_index, start_ti
 
     this.graph.path.attrs({ d: line_gen(data) });
   } else {
+    this.graph.wave1_area.styles({ display: 'none' });
+    this.graph.wave2_area.styles({ display: 'none' });
+    this.graph.area.styles({ display: null });
+
     var y_array = this.y.slice(start_index, end_index);
     var data = d3.range(t_array.length).map((d,i) => { return { x: this.graph.xScale(t_array[i]), y: this.graph.yScale(y_array[i]) } });
     this.graph.path.attrs({ d: line_gen(data) });

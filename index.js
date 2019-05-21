@@ -11,7 +11,7 @@ $('document').ready(() => {
 
 var width = 1366, height = 768;
 
-var timeSpan = 20, displaySpan = 5, dt = 0.01;
+var timeSpan = 30, displaySpan = 5, dt = 0.01;
 var display_index = Math.floor(displaySpan/dt), start_index = 0, end_index = 0;
 var start_time = 0, end_time = 0;
 var time_array = d3.range(0,timeSpan+0.5*dt,dt), time = 0, time_index = 0;
@@ -30,6 +30,10 @@ var toggleSuperposedView = true;
 // Setup
 
 function setup(){
+  createMarkers();
+
+  /**************************************/
+
   wave_1 = new Wave();
   wave_2 = new Wave();
   wave_3 = new SuperposedWave(wave_1, wave_2);
@@ -44,7 +48,7 @@ function setup(){
 
   wave_1.graph.x = 0.3*width;
   wave_1.graph.y = 0;
-  wave_1.graph.width = 0.5*width;
+  wave_1.graph.width = 0.45*width;
   wave_1.graph.height = 0.25*height;
   wave_1.createGraph();
 
@@ -62,7 +66,7 @@ function setup(){
 
   wave_2.graph.x = 0.3*width;
   wave_2.graph.y = 0.25*height;
-  wave_2.graph.width = 0.5*width;
+  wave_2.graph.width = 0.45*width;
   wave_2.graph.height = 0.25*height;
   wave_2.createGraph();
 
@@ -80,7 +84,7 @@ function setup(){
 
   wave_3.graph.x = 0.3*width;
   wave_3.graph.y = 0.5*height;
-  wave_3.graph.width = 0.5*width;
+  wave_3.graph.width = 0.45*width;
   wave_3.graph.height = 0.5*height;
   wave_3.createGraph();
 
@@ -88,8 +92,20 @@ function setup(){
 
   /**************************************/
 
+  createEquation();
   createControls();
   createEventListeners();
+
+}
+
+// ************************************************************************************************** //
+// Markers
+
+function createMarkers(){
+  var svg = d3.select('#canvas');
+  svg.append('line').attrs({ x1: (0.3 + 0.25*0.45)*width, y1: 0, x2: (0.3 + 0.25*0.45)*width, y2: height }).styles({ 'stroke': 'gray', 'stroke-dasharray': '3,3' });
+  svg.append('line').attrs({ x1: (0.3 + 0.5*0.45)*width, y1: 0, x2: (0.3 + 0.5*0.45)*width, y2: height }).styles({ 'stroke': 'gray', 'stroke-dasharray': '3,3' });
+  svg.append('line').attrs({ x1: (0.3 + 0.75*0.45)*width, y1: 0, x2: (0.3 + 0.75*0.45)*width, y2: height }).styles({ 'stroke': 'gray', 'stroke-dasharray': '3,3' });
 }
 
 // ************************************************************************************************** //
@@ -168,11 +184,36 @@ function stop(){
 }
 
 // ************************************************************************************************** //
+// Create Equation
+
+function createEquation(){
+  var text_size = 0.03*height;
+
+  var equation_1 = d3.select('#canvas').append('g').attrs({ 'transform': 'translate(' +0.75*width+ ',' +0.5*0.25*height+ ')' }).styles({ 'font-size': text_size });
+  equation_1.append('text').styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('x=');
+  equation_1.append('text').attrs({ x: 4.5*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('sin(');
+  equation_1.append('text').attrs({ x: 9.5*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('t+');
+  equation_1.append('text').attrs({ x: 13.8*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text(')');
+
+  var equation_2 = d3.select('#canvas').append('g').attrs({ 'transform': 'translate(' +0.75*width+ ',' +(1.5*0.25)*height+ ')' }).styles({ 'font-size': text_size });
+  equation_2.append('text').styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('y=');
+  equation_2.append('text').attrs({ x: 4.5*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('sin(');
+  equation_2.append('text').attrs({ x: 9.5*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text('t+');
+  equation_2.append('text').attrs({ x: 13.8*text_size }).styles({ 'dominant-baseline': 'middle', 'text-anchor': 'start' }).text(')');
+
+  var equation_3 = d3.select('#canvas').append('g').attrs({ 'transform': 'translate(' +(0.75+0.5*0.25)*width+ ',' +(0.75)*height+ ')' }).styles({ 'font-size': text_size });
+  equation_3.append('text').styles({ 'dominant-baseline': 'middle', 'text-anchor': 'middle' }).text('z=x+y');
+}
+
+// ************************************************************************************************** //
 // Create Controls
 
 function createControls(){
   createDials();
-  d3.select('#play-pause-div').styles({ top: (1*height+20)+'px', left: (0*width+650)+'px' });
+  var temp_width = parseFloat(d3.select('#play-pause-div').style('width'));
+  d3.select('#play-pause-div').styles({ top: (1*height+20)+'px', left: ( (0.75+0.5*0.25)*width - 0.5*temp_width )+'px' });
+  d3.select('#toggle-div').styles({ top: (1*height-20)+'px', left: ( (0.75+0.5*0.25)*width - 1.5*temp_width )+'px' })
+  d3.select('#toggle').property('checked', toggleSuperposedView);
 }
 
 // ************************************************************************************************** //
@@ -225,7 +266,12 @@ function createEventListeners(){
   })
 
   d3.select('#play-pause').on('click', function(){
-    if(simulationRunning == true){ stop(); }
+    if(simulationRunning == true){ stop(); d3.timeout(() => { update(); }, 20 ); }
     else{ play(); }
+  })
+
+  d3.select('#toggle').on('click', function(){
+    toggleSuperposedView = d3.select(this).property('checked');
+    if(!simulationRunning){ update(); }
   })
 }

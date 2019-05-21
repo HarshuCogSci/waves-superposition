@@ -45,6 +45,7 @@ Wave.prototype.createPhasor = function(){
   this.phaser.g.append('line').attrs({ x1: -0.5*this.phaser.length, y1: 0, x2: 0.5*this.phaser.length, y2: 0 }).styles({ 'stroke-width': 1, 'stroke': 'gray' });
   this.phaser.g.append('line').attrs({ y1: -0.5*this.phaser.length, x1: 0, y2: 0.5*this.phaser.length, x2: 0 }).styles({ 'stroke-width': 1, 'stroke': 'gray' });
 
+  this.phaser.circle = this.phaser.g.append('circle').attrs({ cx: 0, cy: 0 }).styles({ 'stroke': this.stroke, 'fill': 'none' });
   this.phaser.vector = this.phaser.g.append('line').attrs({ x1: 0, y1: 0, 'marker-end': "url(#arrow)" }).styles({ 'stroke-width': 2, 'stroke': this.stroke });
 }
 
@@ -56,6 +57,7 @@ Wave.prototype.rotatePhasor = function(time_index){
   var y = this.phaser.scale(this.y[time_index]);
 
   this.phaser.vector.attrs({ x2: x, y2: -y });
+  this.phaser.circle.attrs({ r: this.phaser.scale(this.amp) });
 }
 
 // ************************************************************************************************** //

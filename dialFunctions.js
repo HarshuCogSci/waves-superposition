@@ -8,7 +8,7 @@ function createDials(){
     min: amp_min, max: amp_max, step: 0.1,
     svg: 'canvas',
     symbol: 'X', color: 'steelblue', unit: 'rad',
-    cx: 0.85*width, cy: 0.2*height, size: 0.08*height,
+    cx: 0.8*width, cy: 0.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -22,7 +22,7 @@ function createDials(){
     min: freq_min, max: freq_max, step: 0.1,
     svg: 'canvas',
     symbol: 'ω', color: 'orange', unit: 'Hz',
-    cx: 0.91*width, cy: 0.2*height, size: 0.08*height,
+    cx: 0.88*width, cy: 0.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -36,7 +36,7 @@ function createDials(){
     min: 0, max: 360, step: 1,
     svg: 'canvas',
     symbol: 'Ф', color: 'green', unit: 'degree',
-    cx: 0.97*width, cy: 0.2*height, size: 0.08*height,
+    cx: 0.955*width, cy: 0.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -49,8 +49,8 @@ function createDials(){
   var params = {
     min: amp_min, max: amp_max, step: 0.1,
     svg: 'canvas',
-    symbol: 'X', color: 'steelblue', unit: 'rad',
-    cx: 0.85*width, cy: 0.4*height, size: 0.08*height,
+    symbol: 'Y', color: 'steelblue', unit: 'rad',
+    cx: 0.8*width, cy: 1.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -64,7 +64,7 @@ function createDials(){
     min: freq_min, max: freq_max, step: 0.1,
     svg: 'canvas',
     symbol: 'ω', color: 'orange', unit: 'Hz',
-    cx: 0.91*width, cy: 0.4*height, size: 0.08*height,
+    cx: 0.88*width, cy: 1.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -78,7 +78,7 @@ function createDials(){
     min: 0, max: 360, step: 1,
     svg: 'canvas',
     symbol: 'Ф', color: 'green', unit: 'degree',
-    cx: 0.97*width, cy: 0.4*height, size: 0.08*height,
+    cx: 0.955*width, cy: 1.5*0.25*height, size: 0.07*height,
     active: true,
   };
 
@@ -89,7 +89,7 @@ function createDials(){
 
   //*********** TimeSpan Dial ********************//
   var params = {
-    min: 1, max: 20, step: 1,
+    min: 1, max: timeSpan, step: 1,
     svg: 'canvas',
     symbol: 't', color: 'gray', unit: 's',
     cx: 0.85*width, cy: 0.6*height, size: 0.08*height,
